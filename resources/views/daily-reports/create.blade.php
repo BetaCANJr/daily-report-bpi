@@ -1,0 +1,171 @@
+@extends('layouts.user-nav')
+
+@section('title', 'Buat Laporan Baru - Daily Report LPK BPI')
+@section('page-title', 'Buat Laporan Baru')
+@section('page-subtitle', 'Isi form berikut untuk membuat laporan harian')
+
+@section('content')
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form action="{{ route('reports.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    
+                    <div class="row">
+                        <!-- Tanggal Laporan -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="report_date" class="form-label">Tanggal Laporan <span class="text-danger">*</span></label>
+                            <input type="date" 
+                                   class="form-control @error('report_date') is-invalid @enderror" 
+                                   id="report_date" 
+                                   name="report_date" 
+                                   value="{{ old('report_date', now()->format('Y-m-d')) }}"
+                                   required>
+                            @error('report_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <select class="form-select @error('status') is-invalid @enderror" 
+                                    id="status" 
+                                    name="status" 
+                                    required>
+                                <option value="">Pilih Status</option>
+                                <option value="Dalam Pengerjaan" {{ old('status') == 'Dalam Pengerjaan' ? 'selected' : '' }}>Dalam Pengerjaan</option>
+                                <option value="Selesai" {{ old('status') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Tugas Harian -->
+                        <div class="col-12 mb-3">
+                            <label for="tugas_harian" class="form-label">Tugas Harian <span class="text-danger">*</span></label>
+                            <input type="text" 
+                                   class="form-control @error('tugas_harian') is-invalid @enderror" 
+                                   id="tugas_harian" 
+                                   name="tugas_harian" 
+                                   value="{{ old('tugas_harian') }}"
+                                   placeholder="Contoh: Maintenance server, Update website, dll."
+                                   required>
+                            @error('tugas_harian')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Deskripsi Pekerjaan -->
+                        <div class="col-12 mb-3">
+                            <label for="deskripsi" class="form-label">Deskripsi Pekerjaan <span class="text-danger">*</span></label>
+                            <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
+                                      id="deskripsi" 
+                                      name="deskripsi" 
+                                      rows="4" 
+                                      placeholder="Jelaskan detail pekerjaan yang dilakukan..."
+                                      required>{{ old('deskripsi') }}</textarea>
+                            @error('deskripsi')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Kendala -->
+                        <div class="col-12 mb-3">
+                            <label for="kendala" class="form-label">Kendala (Optional)</label>
+                            <textarea class="form-control @error('kendala') is-invalid @enderror" 
+                                      id="kendala" 
+                                      name="kendala" 
+                                      rows="3" 
+                                      placeholder="Jelaskan kendala yang dihadapi (jika ada)...">{{ old('kendala') }}</textarea>
+                            @error('kendala')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Catatan Tambahan -->
+                        <div class="col-12 mb-3">
+                            <label for="catatan_tambahan" class="form-label">Catatan Tambahan (Optional)</label>
+                            <textarea class="form-control @error('catatan_tambahan') is-invalid @enderror" 
+                                      id="catatan_tambahan" 
+                                      name="catatan_tambahan" 
+                                      rows="3" 
+                                      placeholder="Catatan tambahan lainnya...">{{ old('catatan_tambahan') }}</textarea>
+                            @error('catatan_tambahan')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Bukti File -->
+                        <div class="col-12 mb-4">
+                            <label for="bukti_file" class="form-label">Bukti File (Optional)</label>
+                            <input type="file" 
+                                   class="form-control @error('bukti_file') is-invalid @enderror" 
+                                   id="bukti_file" 
+                                   name="bukti_file"
+                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                            <div class="form-text">
+                                Format yang didukung: PDF, DOC, DOCX, JPG, JPEG, PNG. Maksimal 10MB.
+                            </div>
+                            @error('bukti_file')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Kembali
+                                </a>
+                                <button type="submit" class="btn btn-bpi">
+                                    <i class="fas fa-save me-2"></i>Simpan Laporan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .card {
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+</style>
+
+<script>
+    // Set default time untuk tanggal
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateInput = document.getElementById('report_date');
+        if (!dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    });
+</script>
+@endsection
