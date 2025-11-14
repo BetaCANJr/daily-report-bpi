@@ -11,14 +11,41 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Register custom middleware
+        // ✅ Register global middleware
+        $middleware->append([
+            \App\Http\Middleware\XSSProtection::class,
+        ]);
+
+        // ✅ Register web middleware group
+        $middleware->web(append: [
+            \App\Http\Middleware\PasswordPolicy::class,
+        ]);
+
+        // ✅ Register API middleware group (if needed)
+        $middleware->api(append: [
+            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
+        // ✅ Register alias middleware (optional)
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'xss.protection' => \App\Http\Middleware\XSSProtection::class,
+            'password.policy' => \App\Http\Middleware\PasswordPolicy::class,
         ]);
     })
-    ->withProviders([
-        \App\Providers\AuthServiceProvider::class, // TAMBAHKAN INI
-    ])
     ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })->create();
+        // ✅ Register custom exception handling
+        $exceptions->renderable(function (\App\Exceptions\CustomException $e) {
+            return response()->view('errors.custom', [
+                'message' => $e->getUserMessage(),
+                'errorCode' => $e->getErrorCode()
+            ], $e->getErrorCode());
+        });
+
+        $exceptions->renderable(function (\App\Exceptions\ReportException $e) {
+            return response()->view('errors.custom', [
+                'message' => $e->getUserMessage(),
+                'errorCode' => $e->getErrorCode()
+            ], $e->getErrorCode());
+        });
+    })
+    ->create();
