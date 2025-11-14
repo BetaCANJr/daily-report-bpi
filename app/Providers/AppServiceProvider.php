@@ -3,32 +3,37 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
+use App\Models\DailyReport;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
     public function boot(): void
     {
-        // Custom validation rules untuk mencegah XSS
-        Validator::extend('no_special_chars', function ($attribute, $value, $parameters, $validator) {
-            return !preg_match('/[<>"\']|script|iframe|javascript|onload|onerror/i', $value);
+        // Define gates untuk authorization daily reports
+        Gate::define('update-report', function (User $user, DailyReport $report) {
+            return $user->isAdmin() || $user->id === $report->user_id;
         });
 
-        Validator::replacer('no_special_chars', function ($message, $attribute, $rule, $parameters) {
-            return str_replace(':attribute', $attribute, 'The :attribute field contains forbidden characters.');
+        Gate::define('delete-report', function (User $user, DailyReport $report) {
+            return $user->isAdmin() || $user->id === $report->user_id;
         });
 
-        // Password policy validation
-        Validator::extend('strong_password', function ($attribute, $value, $parameters, $validator) {
-            return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $value);
+        Gate::define('view-report', function (User $user, DailyReport $report) {
+            // Semua user bisa view semua laporan
+            return true;
         });
-
-        Validator::replacer('strong_password', function ($message, $attribute, $rule, $parameters) {
-            return 'Password must be at least 8 characters with uppercase, lowercase, number and special character.';
-        });
-
-        // Gunakan Bootstrap pagination
-        Paginator::useBootstrap();
     }
 }
