@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class CustomException extends Exception
 {
@@ -18,12 +17,18 @@ class CustomException extends Exception
         $this->errorCode = $errorCode;
     }
 
-    /**
-     * Report the exception (logging)
-     */
+    public function getUserMessage(): string
+    {
+        return $this->userMessage;
+    }
+
+    public function getErrorCode(): int
+    {
+        return $this->errorCode;
+    }
+
     public function report(): void
     {
-        // Log ke channel khusus daily_reports
         \Log::channel('daily_reports')->error('Custom Exception: ' . $this->getMessage(), [
             'exception' => $this,
             'file' => $this->getFile(),
@@ -32,10 +37,7 @@ class CustomException extends Exception
         ]);
     }
 
-    /**
-     * Render the exception into HTTP response
-     */
-    public function render(Request $request): Response
+    public function render(Request $request)
     {
         if ($request->expectsJson()) {
             return response()->json([

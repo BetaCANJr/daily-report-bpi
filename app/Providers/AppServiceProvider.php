@@ -4,27 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         // Custom validation rules untuk mencegah XSS
         Validator::extend('no_special_chars', function ($attribute, $value, $parameters, $validator) {
-            // Prevent <script>, <iframe>, etc tags dan karakter berbahaya
             return !preg_match('/[<>"\']|script|iframe|javascript|onload|onerror/i', $value);
         });
 
@@ -34,7 +21,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Password policy validation
         Validator::extend('strong_password', function ($attribute, $value, $parameters, $validator) {
-            // Minimal 8 karakter, mengandung huruf besar, kecil, angka, dan simbol
             return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $value);
         });
 

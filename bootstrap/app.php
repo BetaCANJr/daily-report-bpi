@@ -21,12 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\PasswordPolicy::class,
         ]);
 
-        // ✅ Register API middleware group (if needed)
-        $middleware->api(append: [
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        ]);
-
-        // ✅ Register alias middleware (optional)
+        // ✅ Register alias middleware
         $middleware->alias([
             'xss.protection' => \App\Http\Middleware\XSSProtection::class,
             'password.policy' => \App\Http\Middleware\PasswordPolicy::class,
